@@ -287,7 +287,7 @@ class TestCase(unittest.TestCase):
 
     @mock.patch('hubstaff.client_v1.HubstaffClient._request')
     def test_post_method_calls_request_method_with_json(self, m_request):
-        m_request.return_value = {'user': {'id': '123'}}
+        m_request.return_value = {'user': {'id': 123}}
 
         client = HubstaffClient(
             app_token=self.app_token,
@@ -295,13 +295,13 @@ class TestCase(unittest.TestCase):
             password='ValidPasswordHere')
         result = client._post('/users', json={'name': 'Johny'})
 
-        self.assertDictEqual(result, {'user': {'id': '123'}})
+        self.assertDictEqual(result, {'user': {'id': 123}})
         m_request.assert_called_once_with(
             'post', '/users', data=None, json={'name': 'Johny'})
 
     @mock.patch('hubstaff.client_v1.HubstaffClient._request')
     def test_post_method_calls_request_method_with_data(self, m_request):
-        m_request.return_value = {'user': {'id': '123'}}
+        m_request.return_value = {'user': {'id': 123}}
 
         client = HubstaffClient(
             app_token=self.app_token,
@@ -309,7 +309,7 @@ class TestCase(unittest.TestCase):
             password='ValidPasswordHere')
         result = client._post('/users', data={'name': 'Johny'})
 
-        self.assertDictEqual(result, {'user': {'id': '123'}})
+        self.assertDictEqual(result, {'user': {'id': 123}})
         m_request.assert_called_once_with(
             'post', '/users', data={'name': 'Johny'}, json=None)
 
