@@ -22,6 +22,60 @@ class TestCase(unittest.TestCase):
         self.auth_token = ''.join([random.choice(string.ascii_letters)
                                    for _ in range(43)])
 
+    def test_init_raises_error_on_no_auth_token_no_username(self):
+        with self.assertRaises(ValueError) as err_ctx:
+            HubstaffClient(app_token=self.app_token,
+                           password='ValidPasswordHere')
+
+        self.assertEqual(err_ctx.exception.args[0],
+                         'auth_token or (username, password) pair must be set')
+
+    def test_init_raises_error_on_no_auth_token_no_password(self):
+        with self.assertRaises(ValueError) as err_ctx:
+            HubstaffClient(app_token=self.app_token,
+                           username='good@hubstaff.com')
+
+        self.assertEqual(err_ctx.exception.args[0],
+                         'auth_token or (username, password) pair must be set')
+
+    @mock.patch('requests.post')
+    def test_authenticate_method_returns_auth_token_no_password(self, m_post):
+        m_post.return_value.status_code = 401
+        m_post.return_value.json.return_value = {
+            'error': 'Invalid email and/or password'
+        }
+
+        client = HubstaffClient(
+            app_token=self.app_token,
+            auth_token=self.auth_token)
+        auth_token = client.authenticate()
+
+        self.assertEqual(auth_token, self.auth_token)
+
+    @mock.patch('requests.post')
+    def test_authenticate_method_no_password_doesnt_call_api(self, m_post):
+        client = HubstaffClient(
+            app_token=self.app_token,
+            auth_token=self.auth_token)
+        client.authenticate()
+
+        m_post.assert_not_called()
+
+    @mock.patch('requests.post')
+    def test_authenticate_method_returns_auth_token(self, m_post):
+        m_post.return_value.status_code = 200
+        m_post.return_value.json.return_value = {
+            'user': {'auth_token': self.auth_token}
+        }
+
+        client = HubstaffClient(
+            app_token=self.app_token,
+            username='good@hubstaff.com',
+            password='ValidPasswordHere')
+        auth_token = client.authenticate()
+
+        self.assertEqual(auth_token, self.auth_token)
+
     @mock.patch('requests.post')
     def test_authenticate_method_setups_auth_token(self, m_post):
         m_post.return_value.status_code = 200
@@ -33,7 +87,7 @@ class TestCase(unittest.TestCase):
             app_token=self.app_token,
             username='good@hubstaff.com',
             password='ValidPasswordHere')
-        client._authenticate()
+        client.authenticate()
 
         self.assertEqual(client._auth_token, self.auth_token)
 
@@ -48,7 +102,7 @@ class TestCase(unittest.TestCase):
             app_token=self.app_token,
             username='good@hubstaff.com',
             password='ValidPasswordHere')
-        client._authenticate()
+        client.authenticate()
 
         self.assertEqual(m_post.call_count, 1)
         call_args, call_kwargs = m_post.call_args
@@ -78,7 +132,7 @@ class TestCase(unittest.TestCase):
             username='good@hubstaff.com',
             password='ValidPasswordHere')
         with self.assertRaises(HubstaffError) as err_ctx:
-            client._authenticate()
+            client.authenticate()
 
         self.assertEqual(err_ctx.exception.message,
                          'Rate limit has been reached. '
@@ -96,7 +150,7 @@ class TestCase(unittest.TestCase):
             username='good@hubstaff.com',
             password='ValidPasswordHere')
         with self.assertRaises(AuthenticationError) as err_ctx:
-            client._authenticate()
+            client.authenticate()
 
         self.assertEqual(err_ctx.exception.message, 'Invalid app_token')
 
@@ -112,7 +166,7 @@ class TestCase(unittest.TestCase):
             username='bad@hubstaff.com',
             password='ValidPasswordHere')
         with self.assertRaises(AuthenticationError) as err_ctx:
-            client._authenticate()
+            client.authenticate()
 
         self.assertEqual(err_ctx.exception.message,
                          'Invalid email and/or password')
@@ -129,7 +183,7 @@ class TestCase(unittest.TestCase):
             username='good@hubstaff.com',
             password='?' * 16)
         with self.assertRaises(AuthenticationError) as err_ctx:
-            client._authenticate()
+            client.authenticate()
 
         self.assertEqual(err_ctx.exception.message,
                          'Invalid email and/or password')

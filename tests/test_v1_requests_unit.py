@@ -66,9 +66,8 @@ class TestCase(unittest.TestCase):
 
         client = HubstaffClient(
             app_token=self.app_token,
-            username='good@hubstaff.com',
-            password='ValidPasswordHere')
-        client._auth_token = self.auth_token  # already has valid auth_token
+            auth_token=self.auth_token)
+
         result = client._request('get', '/users', params={
             'organization_memberships': False,
             'project_memberships': False,
@@ -78,7 +77,7 @@ class TestCase(unittest.TestCase):
         self.assertDictEqual(result, {'users': []})
 
     @mock.patch('requests.request')
-    @mock.patch('hubstaff.client_v1.HubstaffClient._authenticate')
+    @mock.patch('hubstaff.client_v1.HubstaffClient.authenticate')
     def test_request_method_doesnt_call_authenticate_method(
             self, m_authenticate, m_request):
         m_request.return_value.status_code = 200
@@ -86,9 +85,8 @@ class TestCase(unittest.TestCase):
 
         client = HubstaffClient(
             app_token=self.app_token,
-            username='good@hubstaff.com',
-            password='ValidPasswordHere')
-        client._auth_token = self.auth_token  # already has valid auth_token
+            auth_token=self.auth_token)
+
         client._request('get', '/users', params={
             'organization_memberships': False,
             'project_memberships': False,
@@ -142,9 +140,9 @@ class TestCase(unittest.TestCase):
 
         client = HubstaffClient(
             app_token=self.app_token,
+            auth_token='EXPIRED!',
             username='good@hubstaff.com',
             password='ValidPasswordHere')
-        client._auth_token = 'EXPIRED!'
         client._request('get', '/users', params={
             'organization_memberships': False,
             'project_memberships': False,
@@ -192,7 +190,7 @@ class TestCase(unittest.TestCase):
         })
 
     @mock.patch('requests.request')
-    @mock.patch('hubstaff.client_v1.HubstaffClient._authenticate')
+    @mock.patch('hubstaff.client_v1.HubstaffClient.authenticate')
     def test_request_method_raises_unauthorized_error(self, _, m_request):
         m_request.return_value.status_code = 401
         m_request.return_value.json.return_value = {
@@ -201,10 +199,9 @@ class TestCase(unittest.TestCase):
 
         client = HubstaffClient(
             app_token=self.app_token,
+            auth_token=self.auth_token,  # valid but probably expired
             username='good@hubstaff.com',
             password='ValidPasswordHere')
-        # valid auth_token, but probably expired
-        client._auth_token = self.auth_token
         with self.assertRaises(UnauthorizedError) as err_ctx:
             client._request('get', '/users', params={
                 'organization_memberships': False,
@@ -215,7 +212,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(err_ctx.exception.message, 'Permission denied')
 
     @mock.patch('requests.request')
-    @mock.patch('hubstaff.client_v1.HubstaffClient._authenticate')
+    @mock.patch('hubstaff.client_v1.HubstaffClient.authenticate')
     def test_request_method_tries_to_to_refresh_the_token(
             self, m_authenticate, m_request):
         m_request.return_value.status_code = 401
@@ -225,10 +222,9 @@ class TestCase(unittest.TestCase):
 
         client = HubstaffClient(
             app_token=self.app_token,
+            auth_token=self.auth_token,  # valid but probably expired
             username='good@hubstaff.com',
             password='ValidPasswordHere')
-        # valid auth_token, but probably expired
-        client._auth_token = self.auth_token
 
         with self.assertRaises(UnauthorizedError):
             client._request('get', '/users', params={
@@ -249,9 +245,7 @@ class TestCase(unittest.TestCase):
 
         client = HubstaffClient(
             app_token=self.app_token,
-            username='good@hubstaff.com',
-            password='ValidPasswordHere')
-        client._auth_token = self.auth_token
+            auth_token=self.auth_token)
         with self.assertRaises(HubstaffError) as err_ctx:
             client._request('get', '/users', params={
                 'organization_memberships': False,

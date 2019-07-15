@@ -7,6 +7,7 @@ import os
 from hubstaff.client_v1 import HubstaffClient
 
 
+# @unittest.skip('to prevent rate limits api error')
 class TestCase(unittest.TestCase):
 
     @classmethod

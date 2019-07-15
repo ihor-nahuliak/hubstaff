@@ -12,13 +12,20 @@ class HubstaffClient:
     users_list_endpoint = '/users'
     user_item_endpoint = '/users/%s'
 
-    def __init__(self, app_token, username, password):
+    def __init__(self, app_token, auth_token=None,
+                 username=None, password=None):
         self._app_token = app_token
-        self._auth_token = None
+        if not auth_token and not(username and password):
+            raise ValueError('auth_token or (username, password) '
+                             'pair must be set')
+        self._auth_token = auth_token
         self._username = username
         self._password = password
 
-    def _authenticate(self):
+    def authenticate(self):
+        if not self._username or not self._password:
+            return self._auth_token
+
         resp = requests.post(
             '%s%s' % (self.api_url, self.auth_endpoint),
             headers={'App-Token': self._app_token},
@@ -30,6 +37,8 @@ class HubstaffClient:
             raise AuthenticationError(resp.json()['error'])
         else:
             raise HubstaffError(resp.json()['error'])
+
+        return self._auth_token
 
     def _request(self, method, endpoint, params=None, headers=None,
                  data=None, json=None, refresh_token=False):
@@ -45,7 +54,7 @@ class HubstaffClient:
         :return dict or list: json response data
         """
         if not self._auth_token or refresh_token:
-            self._authenticate()
+            self.authenticate()
 
         headers = headers.copy() if headers else {}
         headers.update({'App-Token': self._app_token,
@@ -58,7 +67,6 @@ class HubstaffClient:
         if resp.status_code == 401:
             if not refresh_token:
                 # token can be expired, needs to refresh
-                self._auth_token = None
                 return self._request(method, endpoint,
                                      params=params,
                                      headers=headers,
