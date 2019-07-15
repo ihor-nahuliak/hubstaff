@@ -10,7 +10,7 @@ Hubstaff API python client
 
 ### Quickstart
 
-Take users list:
+Connect using email & password:
 ```python
 import os
 
@@ -21,7 +21,24 @@ hubstaff = HubstaffClient(
     app_token=os.getenv('HUBSTAFF_APP_TOKEN'),
     username=os.getenv('HUBSTAFF_USERNAME'),
     password=os.getenv('HUBSTAFF_PASSWORD'))
+os.environ['HUBSTAFF_AUTH_TOKEN'] = hubstaff.authenticate()
+```
 
+Connect using received before authentication token:
+```python
+import os
+
+from hubstaff.client_v1 import HubstaffClient
+
+
+hubstaff = HubstaffClient(
+    app_token=os.getenv('HUBSTAFF_APP_TOKEN'),
+    auth_token=os.getenv('HUBSTAFF_AUTH_TOKEN'))
+hubstaff.authenticate()
+```
+
+Take users list:
+```python
 users_list = hubstaff.get_users_list(
     include_projects=True,
     include_organizations=True)
@@ -29,16 +46,6 @@ users_list = hubstaff.get_users_list(
 
 Take user item:
 ```python
-import os
-
-from hubstaff.client_v1 import HubstaffClient
-
-
-hubstaff = HubstaffClient(
-    app_token=os.getenv('HUBSTAFF_APP_TOKEN'),
-    username=os.getenv('HUBSTAFF_USERNAME'),
-    password=os.getenv('HUBSTAFF_PASSWORD'))
-
 user_item = hubstaff.get_user_item(user_id=123)
 user_item['projects'] = hubstaff.get_user_projects_list(user_id=123)
 user_item['organizations'] = hubstaff.get_user_organizations_list(user_id=123)
