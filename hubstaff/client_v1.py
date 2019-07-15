@@ -79,3 +79,13 @@ class HubstaffClient:
 
     def _post(self, endpoint, data=None, json=None, **kwargs):
         return self._request('post', endpoint, data=data, json=json, **kwargs)
+
+    def get_users_list(self, organization_memberships=False,
+                       project_memberships=False, offset=0):
+        result = self._get(self.users_list_endpoint, params={
+            'organization_memberships': organization_memberships,
+            'project_memberships': project_memberships,
+            'offset': offset
+        })
+        users_list = result['users']
+        return users_list
