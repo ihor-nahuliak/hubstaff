@@ -1,5 +1,6 @@
-requests
-
+requests>=2.22.0
+setuptools
+twine
 pytest
 pytest-flakes
 pytest-mock
