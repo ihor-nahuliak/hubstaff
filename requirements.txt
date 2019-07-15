@@ -1,0 +1,7 @@
+requests
+
+pytest
+pytest-flakes
+pytest-mock
+pytest-cov
+python-coveralls
