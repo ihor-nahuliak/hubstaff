@@ -14,9 +14,5 @@ class HubstaffError(Exception):
         self.message = self.args[0]
 
 
-class AuthenticationError(HubstaffError):
+class HubstaffAuthError(HubstaffError):
     message = 'authentication_error'
-
-
-class UnauthorizedError(HubstaffError):
-    message = 'unauthorized_error'

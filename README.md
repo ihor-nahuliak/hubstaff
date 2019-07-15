@@ -23,6 +23,23 @@ hubstaff = HubstaffClient(
     password=os.getenv('HUBSTAFF_PASSWORD'))
 
 users_list = hubstaff.get_users_list(
-    organization_memberships=True,
-    project_memberships=True)
+    include_projects=True,
+    include_organizations=True)
+```
+
+Take user item:
+```python
+import os
+
+from hubstaff.client_v1 import HubstaffClient
+
+
+hubstaff = HubstaffClient(
+    app_token=os.getenv('HUBSTAFF_APP_TOKEN'),
+    username=os.getenv('HUBSTAFF_USERNAME'),
+    password=os.getenv('HUBSTAFF_PASSWORD'))
+
+user_item = hubstaff.get_user_item(user_id=123)
+user_item['projects'] = hubstaff.get_user_projects_list(user_id=123)
+user_item['organizations'] = hubstaff.get_user_organizations_list(user_id=123)
 ```

@@ -14,8 +14,12 @@ class TestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.client = HubstaffClient(
             app_token=os.getenv('HUBSTAFF_APP_TOKEN'),
+            auth_token=os.getenv('HUBSTAFF_AUTH_TOKEN'),
             username=os.getenv('HUBSTAFF_USERNAME'),
             password=os.getenv('HUBSTAFF_PASSWORD'))
+        # save auth_token to prevent auth api throttling
+        if not os.getenv('HUBSTAFF_AUTH_TOKEN'):
+            os.environ['HUBSTAFF_AUTH_TOKEN'] = cls.client.authenticate()
 
     def test_get_users_list(self):
         users_list = self.client.get_users_list()
@@ -26,8 +30,8 @@ class TestCase(unittest.TestCase):
         self.assertIn('email', users_list[0])
         self.assertIn('last_activity', users_list[0])
 
-    def test_get_users_list_organization_memberships(self):
-        users_list = self.client.get_users_list(organization_memberships=True)
+    def test_get_users_list_include_organizations(self):
+        users_list = self.client.get_users_list(include_organizations=True)
 
         self.assertTrue(len(users_list) >= 1)
         self.assertIn('id', users_list[0])
@@ -36,8 +40,8 @@ class TestCase(unittest.TestCase):
         self.assertIn('last_activity', users_list[0])
         self.assertIn('organizations', users_list[0])
 
-    def test_get_users_list_project_memberships(self):
-        users_list = self.client.get_users_list(project_memberships=True)
+    def test_get_users_list_include_projects(self):
+        users_list = self.client.get_users_list(include_projects=True)
 
         self.assertTrue(len(users_list) >= 1)
         self.assertIn('id', users_list[0])

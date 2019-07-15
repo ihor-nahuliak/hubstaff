@@ -5,7 +5,7 @@ import unittest
 import os
 
 from hubstaff.client_v1 import HubstaffClient
-from hubstaff.exceptions import AuthenticationError
+from hubstaff.exceptions import HubstaffAuthError
 
 
 @unittest.skip('to prevent rate limits api error')
@@ -25,7 +25,7 @@ class TestCase(unittest.TestCase):
             app_token='x' * 43,
             username=os.getenv('HUBSTAFF_USERNAME'),
             password=os.getenv('HUBSTAFF_PASSWORD'))
-        with self.assertRaises(AuthenticationError) as err_ctx:
+        with self.assertRaises(HubstaffAuthError) as err_ctx:
             client.authenticate()
 
         self.assertEqual(err_ctx.exception.message, 'Invalid app_token')
@@ -35,7 +35,7 @@ class TestCase(unittest.TestCase):
             app_token=os.getenv('HUBSTAFF_APP_TOKEN'),
             username='noreply@hubstaff.com',
             password=os.getenv('HUBSTAFF_PASSWORD'))
-        with self.assertRaises(AuthenticationError) as err_ctx:
+        with self.assertRaises(HubstaffAuthError) as err_ctx:
             client.authenticate()
 
         self.assertEqual(err_ctx.exception.message,
@@ -46,7 +46,7 @@ class TestCase(unittest.TestCase):
             app_token=os.getenv('HUBSTAFF_APP_TOKEN'),
             username=os.getenv('HUBSTAFF_USERNAME'),
             password='?' * 16)
-        with self.assertRaises(AuthenticationError) as err_ctx:
+        with self.assertRaises(HubstaffAuthError) as err_ctx:
             client.authenticate()
 
         self.assertEqual(err_ctx.exception.message,

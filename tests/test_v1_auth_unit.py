@@ -11,7 +11,7 @@ except ImportError:
     import mock  # python 2 compatibility
 
 from hubstaff.client_v1 import HubstaffClient
-from hubstaff.exceptions import HubstaffError, AuthenticationError
+from hubstaff.exceptions import HubstaffError, HubstaffAuthError
 
 
 class TestCase(unittest.TestCase):
@@ -149,7 +149,7 @@ class TestCase(unittest.TestCase):
             app_token='bad_token',
             username='good@hubstaff.com',
             password='ValidPasswordHere')
-        with self.assertRaises(AuthenticationError) as err_ctx:
+        with self.assertRaises(HubstaffAuthError) as err_ctx:
             client.authenticate()
 
         self.assertEqual(err_ctx.exception.message, 'Invalid app_token')
@@ -165,7 +165,7 @@ class TestCase(unittest.TestCase):
             app_token=self.app_token,
             username='bad@hubstaff.com',
             password='ValidPasswordHere')
-        with self.assertRaises(AuthenticationError) as err_ctx:
+        with self.assertRaises(HubstaffAuthError) as err_ctx:
             client.authenticate()
 
         self.assertEqual(err_ctx.exception.message,
@@ -182,7 +182,7 @@ class TestCase(unittest.TestCase):
             app_token=self.app_token,
             username='good@hubstaff.com',
             password='?' * 16)
-        with self.assertRaises(AuthenticationError) as err_ctx:
+        with self.assertRaises(HubstaffAuthError) as err_ctx:
             client.authenticate()
 
         self.assertEqual(err_ctx.exception.message,

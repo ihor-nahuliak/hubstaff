@@ -11,7 +11,7 @@ except ImportError:
     import mock  # python 2 compatibility
 
 from hubstaff.client_v1 import HubstaffClient
-from hubstaff.exceptions import HubstaffError, UnauthorizedError
+from hubstaff.exceptions import HubstaffError, HubstaffAuthError
 
 
 class TestCase(unittest.TestCase):
@@ -202,7 +202,7 @@ class TestCase(unittest.TestCase):
             auth_token=self.auth_token,  # valid but probably expired
             username='good@hubstaff.com',
             password='ValidPasswordHere')
-        with self.assertRaises(UnauthorizedError) as err_ctx:
+        with self.assertRaises(HubstaffAuthError) as err_ctx:
             client._request('get', '/users', params={
                 'organization_memberships': False,
                 'project_memberships': False,
@@ -226,7 +226,7 @@ class TestCase(unittest.TestCase):
             username='good@hubstaff.com',
             password='ValidPasswordHere')
 
-        with self.assertRaises(UnauthorizedError):
+        with self.assertRaises(HubstaffAuthError):
             client._request('get', '/users', params={
                 'organization_memberships': False,
                 'project_memberships': False,

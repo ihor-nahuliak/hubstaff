@@ -11,6 +11,8 @@ class HubstaffClient:
     auth_endpoint = '/auth'
     users_list_endpoint = '/users'
     user_item_endpoint = '/users/%s'
+    user_projects_list_endpoint = '/users/%s/projects'
+    user_organizations_list_endpoint = '/users/%s/organizations'
 
     def __init__(self, app_token, auth_token=None,
                  username=None, password=None):
@@ -34,7 +36,7 @@ class HubstaffClient:
         if resp.status_code == 200:
             self._auth_token = resp.json()['user']['auth_token']
         elif resp.status_code == 401:
-            raise AuthenticationError(resp.json()['error'])
+            raise HubstaffAuthError(resp.json()['error'])
         else:
             raise HubstaffError(resp.json()['error'])
 
@@ -74,7 +76,7 @@ class HubstaffClient:
                                      json=json,
                                      refresh_token=True)
             # token was refreshed, but 401 response still happens
-            raise UnauthorizedError(resp.json()['error'])
+            raise HubstaffAuthError(resp.json()['error'])
 
         result = resp.json()
         if 'error' in result:
@@ -88,12 +90,30 @@ class HubstaffClient:
     def _post(self, endpoint, data=None, json=None, **kwargs):
         return self._request('post', endpoint, data=data, json=json, **kwargs)
 
-    def get_users_list(self, organization_memberships=False,
-                       project_memberships=False, offset=0):
+    def get_users_list(self, include_projects=False,
+                       include_organizations=False,
+                       offset=0):
         result = self._get(self.users_list_endpoint, params={
-            'organization_memberships': organization_memberships,
-            'project_memberships': project_memberships,
+            'organization_memberships': include_organizations,
+            'project_memberships': include_projects,
             'offset': offset
         })
         users_list = result['users']
         return users_list
+
+    def get_user_item(self, user_id):
+        result = self._get(self.user_item_endpoint % user_id)
+        user_item = result['user']
+        return user_item
+
+    def get_user_projects_list(self, user_id, offset=0):
+        result = self._get(self.user_projects_list_endpoint % user_id,
+                           params={'offset': offset})
+        projects_list = result['projects']
+        return projects_list
+
+    def get_user_organizations_list(self, user_id, offset=0):
+        result = self._get(self.user_organizations_list_endpoint % user_id,
+                           params={'offset': offset})
+        organizations_list = result['organizations']
+        return organizations_list
