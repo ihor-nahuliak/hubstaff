@@ -50,3 +50,13 @@ user_item = hubstaff.get_user_item(user_id=123)
 user_item['projects'] = hubstaff.get_user_projects_list(user_id=123)
 user_item['organizations'] = hubstaff.get_user_organizations_list(user_id=123)
 ```
+
+Take projects list:
+```python
+projects_list = hubstaff.get_projects_list(status='active')
+```
+
+Take project item:
+```python
+project_item = hubstaff.get_project_item(project_id=123)
+```

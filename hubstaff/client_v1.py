@@ -13,6 +13,9 @@ class HubstaffClient:
     user_item_endpoint = '/users/%s'
     user_projects_list_endpoint = '/users/%s/projects'
     user_organizations_list_endpoint = '/users/%s/organizations'
+    projects_list_endpoint = '/projects'
+    project_item_endpoint = '/projects/%s'
+    allowed_project_status = ('active', 'archived')
 
     def __init__(self, app_token, auth_token=None,
                  username=None, password=None):
@@ -117,3 +120,22 @@ class HubstaffClient:
                            params={'offset': offset})
         organizations_list = result['organizations']
         return organizations_list
+
+    def get_projects_list(self, status=None, offset=0):
+        params = {'offset': offset}
+
+        if status:
+            if status not in self.allowed_project_status:
+                raise ValueError('status must be one of: %s' %
+                                 ', '.join(self.allowed_project_status))
+            params['status'] = status
+
+        result = self._get(self.projects_list_endpoint, params=params)
+
+        projects_list = result['projects']
+        return projects_list
+
+    def get_project_item(self, project_id):
+        result = self._get(self.project_item_endpoint % project_id)
+        project_item = result['project']
+        return project_item
