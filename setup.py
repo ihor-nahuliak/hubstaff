@@ -40,7 +40,7 @@ __python_requires__ = [
     '!=3.4.*',
 ]
 __install_requires__ = [
-    'requests',
+    'requests>=2.22.0',
 ]
 __extras_requires__ = {
     'dev': [
