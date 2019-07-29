@@ -22,10 +22,10 @@ class TestCase(unittest.TestCase):
         if not os.getenv('HUBSTAFF_AUTH_TOKEN'):
             os.environ['HUBSTAFF_AUTH_TOKEN'] = cls.client.authenticate()
         # date range
-        cls.date_from = datetime.fromisoformat(
-            os.getenv('HUBSTAFF_TEST_DATE_FROM'))
-        cls.date_to = datetime.fromisoformat(
-            os.getenv('HUBSTAFF_TEST_DATE_TO'))
+        cls.date_from = datetime.strptime(
+            os.getenv('HUBSTAFF_TEST_DATE_FROM'), '%Y-%m-%d')
+        cls.date_to = datetime.strptime(
+            os.getenv('HUBSTAFF_TEST_DATE_TO'), '%Y-%m-%d')
         # save first found user id
         users_list = cls.client.get_users_list(include_projects=True,
                                                include_organizations=True)
