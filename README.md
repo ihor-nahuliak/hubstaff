@@ -80,8 +80,3 @@ activities_list = hubstaff.get_activities_list(
     organization_id_list=[123, 456],
     project_id_list=[123, 456])
 ```
-
-Take activity item:
-```python
-activity_item = hubstaff.get_activity_item(activity_id=123)
-```

@@ -19,7 +19,6 @@ class HubstaffClient:
     tasks_list_endpoint = '/tasks'
     task_item_endpoint = '/tasks/%s'
     activities_list_endpoint = '/activities'
-    activity_item_endpoint = '/activities/%s'
 
     def __init__(self, app_token, auth_token=None,
                  username=None, password=None):
@@ -184,8 +183,3 @@ class HubstaffClient:
 
         activities_list = result['activities']
         return activities_list
-
-    def get_activity_item(self, activity_id):
-        result = self._get(self.activity_item_endpoint % activity_id)
-        activity_item = result['activity']
-        return activity_item
