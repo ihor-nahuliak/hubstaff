@@ -60,3 +60,13 @@ Take project item:
 ```python
 project_item = hubstaff.get_project_item(project_id=123)
 ```
+
+Take tasks list:
+```python
+tasks_list = hubstaff.get_tasks_list(project_id_list=[123, 456])
+```
+
+Take task item:
+```python
+task_item = hubstaff.get_task_item(task_id=123)
+```
