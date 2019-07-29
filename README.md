@@ -70,3 +70,18 @@ Take task item:
 ```python
 task_item = hubstaff.get_task_item(task_id=123)
 ```
+
+Take activities list:
+```python
+activities_list = hubstaff.get_activities_list(
+    datetime(year=2019, month=7, day=29),
+    datetime(year=2019, month=7, day=30),
+    user_id_list=[123, 456],
+    organization_id_list=[123, 456],
+    project_id_list=[123, 456])
+```
+
+Take activity item:
+```python
+activity_item = hubstaff.get_activity_item(activity_id=123)
+```
