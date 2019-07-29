@@ -18,6 +18,7 @@ class HubstaffClient:
     allowed_project_status = ('active', 'archived')
     tasks_list_endpoint = '/tasks'
     task_item_endpoint = '/tasks/%s'
+    activities_list_endpoint = '/activities'
 
     def __init__(self, app_token, auth_token=None,
                  username=None, password=None):
@@ -157,3 +158,28 @@ class HubstaffClient:
         result = self._get(self.task_item_endpoint % task_id)
         task_item = result['task']
         return task_item
+
+    def get_activities_list(self, from_, to_,
+                            user_id_list=None,
+                            organization_id_list=None,
+                            project_id_list=None,
+                            offset=0):
+        params = {
+            'offset': offset,
+            'start_time': from_.isoformat(),
+            'stop_time': to_.isoformat(),
+        }
+
+        if user_id_list:
+            params['users'] = ','.join(map(str, user_id_list))
+
+        if organization_id_list:
+            params['organizations'] = ','.join(map(str, organization_id_list))
+
+        if project_id_list:
+            params['projects'] = ','.join(map(str, project_id_list))
+
+        result = self._get(self.activities_list_endpoint, params=params)
+
+        activities_list = result['activities']
+        return activities_list
